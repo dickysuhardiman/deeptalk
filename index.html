@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surprise untuk Pacarku</title>
+<style>
+  body {
+    margin:0;
+    font-family: 'Arial', sans-serif;
+    background: url('FOTO_KALIAN.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
+    text-align: center;
+  }
+  #overlay {
+    background-color: rgba(0,0,0,0.6);
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  button {
+    padding: 15px 30px;
+    font-size: 18px;
+    margin: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    background: #ff4081;
+    color: #fff;
+    animation: blink 1s infinite alternate;
+  }
+  @keyframes blink {
+    from {opacity:1;}
+    to {opacity:0.5;}
+  }
+  #questionContainer {
+    display:none;
+    margin-top: 30px;
+  }
+  .question {
+    margin: 20px 0;
+    font-size: 20px;
+  }
+  input[type="range"] {
+    width: 80%;
+  }
+  #nextBtn {
+    padding:10px 20px;
+    font-size: 16px;
+    margin-top: 15px;
+    cursor:pointer;
+    border:none;
+    border-radius:8px;
+    background:#2196f3;
+    color:#fff;
+  }
+  #result {
+    display:none;
+    margin-top: 30px;
+    font-size:22px;
+    padding: 20px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 15px;
+  }
+</style>
+</head>
+<body>
+<div id="overlay">
+  <h1>Apakah kamu NAMA PACAR?</h1>
+  <button id="yesBtn">Betul</button>
+  <button id="noBtn">Bukan</button>
+  <div id="passwordDiv" style="display:none; margin-top:15px;">
+    <input type="text" id="passwordInput" placeholder="Masukkan kata sandi">
+    <button id="passwordBtn">Submit</button>
+  </div>
+</div>
+
+<div id="questionContainer">
+  <div id="intro" style="display:block;">
+    <h2>Selamat datang, kesayanganku 💕</h2>
+    <p>Kita akan main game kecil, lihat seberapa kuat hubungan kita menurut psikologi hubungan.</p>
+    <button id="startBtn">Mulai</button>
+  </div>
+  <div id="questionSection" style="display:none;">
+    <div class="question" id="questionText"></div>
+    <input type="range" id="answerSlider" min="1" max="10" value="5">
+    <div>Nilai: <span id="sliderValue">5</span></div>
+    <button id="nextBtn">Next</button>
+  </div>
+</div>
+
+<div id="result"></div>
+
+<script>
+const overlay = document.getElementById('overlay');
+const yesBtn = document.getElementById('yesBtn');
+const noBtn = document.getElementById('noBtn');
+const passwordDiv = document.getElementById('passwordDiv');
+const passwordInput = document.getElementById('passwordInput');
+const passwordBtn = document.getElementById('passwordBtn');
+const questionContainer = document.getElementById('questionContainer');
+const intro = document.getElementById('intro');
+const startBtn = document.getElementById('startBtn');
+const questionSection = document.getElementById('questionSection');
+const questionText = document.getElementById('questionText');
+const answerSlider = document.getElementById('answerSlider');
+const sliderValue = document.getElementById('sliderValue');
+const nextBtn = document.getElementById('nextBtn');
+const resultDiv = document.getElementById('result');
+
+const questions = [
+"Seberapa ingin kamu bertahan di hubungan ini?",
+"Seberapa besar niat kamu buat melanjutkan hubungan ini ke depan?",
+"Seberapa kamu rela bertahan walau kita lagi ada masalah?",
+"Seberapa kamu siap sabar dengan kondisi LDR kita?",
+"Seberapa kuat kamu yakin hubungan ini bisa dipertahankan?",
+"Seberapa kamu mau terus berusaha biar hubungan ini jalan?",
+"Seberapa penting hubungan ini buat kamu saat ini?",
+"Seberapa kamu merasa hubungan ini masih layak diperjuangkan?",
+"Seberapa kamu masih pengen aku ada di hidup kamu?",
+"Seberapa besar keinginan kamu tetap bareng aku walaupun keadaan lagi berat?",
+"Seberapa kamu percaya kita bisa bertahan lama bersama?",
+"Seberapa kamu siap mengalah demi hubungan ini?",
+"Seberapa kamu merasa lebih baik bertahan daripada menyerah?",
+"Seberapa besar tekad kamu buat menjaga hubungan ini?",
+"Seberapa kamu yakin hubungan ini nggak sia-sia buat dipertahankan?",
+"Seberapa kamu masih mikirin masa depan kita bersama?",
+"Seberapa kamu rela ngadepin susah senang bareng aku?",
+"Seberapa kamu percaya kita bisa melewati masalah tanpa harus pisah?",
+"Seberapa kamu merasa hubungan ini masih kuat?",
+"Seberapa besar keinginan kamu menjaga aku tetap di sisi kamu?"
+];
+
+let currentQuestion = 0;
+let scores = [];
+
+yesBtn.onclick = () => {
+  passwordDiv.style.display = 'block';
+};
+noBtn.onclick = () => {
+  alert("Yakin bukan? Balik sana stranger 🤭");
+};
+
+passwordBtn.onclick = () => {
+  if(passwordInput.value.toLowerCase() === 'NAMA_KAMU'.toLowerCase()) {
+    overlay.style.display = 'none';
+    questionContainer.style.display = 'block';
+  } else {
+    alert("Password salah 😅");
+  }
+};
+
+startBtn.onclick = () => {
+  intro.style.display = 'none';
+  questionSection.style.display = 'block';
+  showQuestion();
+};
+
+answerSlider.oninput = () => {
+  sliderValue.textContent = answerSlider.value;
+};
+
+nextBtn.onclick = () => {
+  scores.push(parseInt(answerSlider.value));
+  currentQuestion++;
+  if(currentQuestion < questions.length){
+    showQuestion();
+  } else {
+    showResult();
+  }
+};
+
+function showQuestion(){
+  questionText.textContent = questions[currentQuestion];
+  answerSlider.value = 5;
+  sliderValue.textContent = 5;
+}
+
+function showResult(){
+  questionSection.style.display = 'none';
+  let total = scores.reduce((a,b)=>a+b,0);
+  let avg = total / scores.length;
+  let kategori = "";
+  if(avg >= 6){
+    kategori = "Positif (masih pengen bertahan/lanjut bareng) 💖";
+  } else {
+    kategori = "Negatif (condong pengen sendiri/masing-masing) 💔";
+  }
+  resultDiv.innerHTML = `<h2>Hasil kamu: ${avg.toFixed(1)}</h2><p>${kategori}</p><p>Screenshot hasil ini & kirim ke aku 📸</p>`;
+  resultDiv.style.display = 'block';
+}
+</script>
